@@ -2,7 +2,7 @@ import sounddevice as sd    # https://python-sounddevice.readthedocs.io/en/
 import numpy as np          # https://numpy.org/doc/stable/reference/
 import soundfile as sf      # https://python-soundfile.readthedocs.io/
 from typing import Type
-
+import math
 
 
 class Tone:
@@ -11,12 +11,15 @@ class Tone:
         self.hertz = hertz
         self.amplitude = amplitude_pct / 100
 
-d = Tone(880.,0.5)
-d2 = Tone(2*523.25,0.5)
+d1 = Tone(880.,0.5) #A5
+d2 = Tone(1046.5,0.5) #C6
+d3 = Tone(1244.51,0.5) # E6♭
+d3 = Tone(1174.66,0.5) # D6
 
 input_device, output_device = sd.default.device
 output_defaults = sd.query_devices(device=output_device)
-sr = sd.default.samplerate = output_defaults["default_samplerate"]
+sd.default.samplerate = output_defaults["default_samplerate"]
+sr = int(sd.default.samplerate)
 
 def generate_tone(d: Type[Tone]):
     sample_set = np.arange(d.seconds * sr)
@@ -25,15 +28,18 @@ def generate_tone(d: Type[Tone]):
     return tone
 
 
-tone1 = generate_tone(d)
-tone2 = generate_tone(d2)
+t1 = generate_tone(d1)
+t2 = generate_tone(d2)
+t3 = generate_tone(d3)
 
-sr = int(sr)
-sf.write('tone1.ogg', tone1, sr, 'VORBIS')
-sd.play(tone1)
+final_tone = np.average(np.array([t1,t2,t3]),axis=0)
 
-sf.write('tone2.ogg', tone2, sr, 'VORBIS')
-sd.play(tone2)
+sf.write('tone-t1.ogg', t1, sr, 'VORBIS')
 
-sf.write('tone3.ogg', tone1+tone2, sr, 'VORBIS')
-sd.play(tone1+tone2)
+sf.write('tone-t2.ogg', t2, sr, 'VORBIS')
+
+sf.write('tone-t3.ogg', t3, sr, 'VORBIS')
+
+sf.write('tone-final.ogg', final_tone, sr, 'VORBIS')
+
+sd.play(final_tone)
