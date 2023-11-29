@@ -28,9 +28,6 @@ with open('tones.json','r') as json_file:
     data = json.load(json_file)
 
 for x in data['tone_data']:
-    global audio_tones
-    global mt
-    global final_tone
     mtf_data = x['mtf_data']
     for mtf_tone in mtf_data:
         mt = [ Tone(i,x['duration'],x['amplitude_pct']) for i in mtf_tone ]
