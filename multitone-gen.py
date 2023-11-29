@@ -1,20 +1,17 @@
+#!/usr/bin/env python3
+#
+import sys
 import sounddevice as sd    # https://python-sounddevice.readthedocs.io/en/
 import numpy as np          # https://numpy.org/doc/stable/reference/
 import soundfile as sf      # https://python-soundfile.readthedocs.io/
 from typing import Type
-import math
-
+import json
 
 class Tone:
     def __init__(self,hertz,seconds=1,amplitude_pct = 80):
         self.seconds = seconds
         self.hertz = hertz
         self.amplitude = amplitude_pct / 100
-
-d1 = Tone(880.,0.5) #A5
-d2 = Tone(1046.5,0.5) #C6
-d3 = Tone(1244.51,0.5) # E6♭
-d3 = Tone(1174.66,0.5) # D6
 
 input_device, output_device = sd.default.device
 output_defaults = sd.query_devices(device=output_device)
@@ -27,19 +24,40 @@ def generate_tone(d: Type[Tone]):
     tone = tone * d.amplitude
     return tone
 
+with open('tones.json','r') as json_file:
+    data = json.load(json_file)
 
-t1 = generate_tone(d1)
-t2 = generate_tone(d2)
-t3 = generate_tone(d3)
+for x in data['tone_data']:
+    global audio_tones
+    global mt
+    global final_tone
+    mtf_data = x['mtf_data']
+    for mtf_tone in mtf_data:
+        mt = [ Tone(i,x['duration'],x['amplitude_pct']) for i in mtf_tone ]
+        # construct file name from frequency values
+        ss = [ str(t.hertz) for t in mt ]
+        output_filename = f"./oup/mt_{'-'.join(ss)}.ogg"
+        # generate each tone separately then combine
+        audio_tones = [ generate_tone(t) for t in mt ]
+        final_tone = np.average(np.asanyarray(audio_tones),axis=0)
+        # write mixed tones as multitone frequency to filename
+        sf.write(output_filename, final_tone, sr, 'VORBIS')
+        print(f'Wrote file "{output_filename}"...', file=sys.stderr)
 
-final_tone = np.average(np.array([t1,t2,t3]),axis=0)
 
-sf.write('tone-t1.ogg', t1, sr, 'VORBIS')
 
-sf.write('tone-t2.ogg', t2, sr, 'VORBIS')
 
-sf.write('tone-t3.ogg', t3, sr, 'VORBIS')
 
-sf.write('tone-final.ogg', final_tone, sr, 'VORBIS')
 
-sd.play(final_tone)
+
+
+
+
+
+
+
+
+
+
+
+
