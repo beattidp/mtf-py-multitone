@@ -1,18 +1,17 @@
 {
     "tone_data": [ 
         {
-            "duration": 1.2,
-            "amplitude_pct": 80,
+            "duration": 0.6,
+            "amplitude": 0.80,
+            "description": "Train whistle tones",
+            "tag": "DOT_8861_DS1",
+            "source": "https://rosap.ntl.bts.gov/view/dot/8861/dot_8861_DS1.pdf",
             "mtf_data": [
-                [ 343,453,535,633 ],
-                [ 325,453,535,633 ]
-            ]
-        },
-        {
-            "duration": 0.5,
-            "amplitude_pct": 30,
-            "mtf_data": [
-                [ 880,1046.5,1244.51,1174.66]
+                [255, 311, 440],
+                [311, 370, 480],
+                [311, 370, 494],
+                [255, 311, 370, 440, 554],
+                [311, 370, 415, 494, 622]
             ]
         }
     ]
